@@ -3,7 +3,7 @@ import { requireAuth, loadUser, requireUser } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { db } from '../db/index.js';
-import { users, clientProfiles } from '../db/schema.js';
+import { users, clientProfiles, newsletterSubscribers } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import { generateAblyToken } from '../config/ably.js';
 import { createCustomer } from '../config/stripe.js';
@@ -136,6 +136,41 @@ router.patch('/status', requireAuth(), requireUser, asyncHandler(async (req, res
   res.json({
     success: true,
     data: updatedUser,
+  });
+}));
+
+// Newsletter subscription (public endpoint)
+router.post('/newsletter', asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Valid email address is required',
+    });
+  }
+
+  // Check if already subscribed
+  const [existing] = await db
+    .select()
+    .from(newsletterSubscribers)
+    .where(eq(newsletterSubscribers.email, email.toLowerCase()))
+    .limit(1);
+
+  if (existing) {
+    return res.json({
+      success: true,
+      message: 'Already subscribed',
+    });
+  }
+
+  await db.insert(newsletterSubscribers).values({
+    email: email.toLowerCase(),
+  });
+
+  res.status(201).json({
+    success: true,
+    message: 'Successfully subscribed to newsletter',
   });
 }));
 

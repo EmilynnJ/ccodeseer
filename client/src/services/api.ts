@@ -21,7 +21,7 @@ class ApiService {
       (error: AxiosError) => {
         if (error.response?.status === 401) {
           // Handle unauthorized - redirect to login
-          window.location.href = '/login';
+          window.location.href = '/sign-in';
         }
         return Promise.reject(error);
       }
@@ -326,6 +326,20 @@ class ApiService {
 
   async markAllNotificationsRead() {
     return this.client.patch('/notifications/read-all');
+  }
+
+  // Newsletter
+  async subscribeNewsletter(email: string) {
+    return this.client.post('/auth/newsletter', { email });
+  }
+
+  // Public data for homepage
+  async getFeaturedProducts(limit = 4) {
+    return this.client.get('/shop/products', { params: { limit } });
+  }
+
+  async getRecentForumPosts(limit = 4) {
+    return this.client.get('/forum/recent', { params: { limit } });
   }
 }
 

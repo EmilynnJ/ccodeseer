@@ -32,6 +32,35 @@ router.get('/categories', asyncHandler(async (req, res) => {
   });
 }));
 
+// Get recent posts (public, for homepage)
+router.get('/recent', asyncHandler(async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 4, 10);
+
+  const posts = await db
+    .select({
+      id: forumPosts.id,
+      title: forumPosts.title,
+      content: forumPosts.content,
+      replyCount: forumPosts.replyCount,
+      viewCount: forumPosts.viewCount,
+      createdAt: forumPosts.createdAt,
+      author: {
+        id: users.id,
+        fullName: users.fullName,
+        profileImage: users.profileImage,
+      },
+    })
+    .from(forumPosts)
+    .leftJoin(users, eq(forumPosts.authorId, users.id))
+    .orderBy(desc(forumPosts.createdAt))
+    .limit(limit);
+
+  res.json({
+    success: true,
+    data: posts,
+  });
+}));
+
 // Create category (admin only)
 router.post('/categories', requireAuth(), requireAdmin, asyncHandler(async (req, res) => {
   const { name, description, slug, icon, sortOrder = 0 } = req.body;

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { Toaster } from 'react-hot-toast';
@@ -18,17 +18,50 @@ interface ReadingRequest {
 }
 
 export default function Layout() {
-  const { isSignedIn } = useAuth();
-  const { user, fetchUser } = useAuthStore();
+  const { isSignedIn, getToken } = useAuth();
+  const { user: clerkUser } = useUser();
+  const { user, fetchUser, syncUser } = useAuthStore();
   const { initAbly, disconnect, subscribeToNotifications } = useRealtimeStore();
   const [incomingRequest, setIncomingRequest] = useState<ReadingRequest | null>(null);
+  const tokenSetRef = useRef(false);
 
-  // Sync user on auth change
+  // Set Clerk JWT token on API client and sync user
   useEffect(() => {
-    if (isSignedIn && !user) {
-      fetchUser();
+    if (!isSignedIn || !clerkUser) {
+      tokenSetRef.current = false;
+      api.setAuthToken(null);
+      return;
     }
-  }, [isSignedIn, user]);
+
+    const setupAuth = async () => {
+      try {
+        const token = await getToken();
+        if (token) {
+          api.setAuthToken(token);
+          tokenSetRef.current = true;
+
+          // Sync user to our database if not already loaded
+          if (!user) {
+            try {
+              await fetchUser();
+            } catch {
+              // User doesn't exist in our DB yet — sync from Clerk
+              await syncUser({
+                email: clerkUser.primaryEmailAddress?.emailAddress || '',
+                username: clerkUser.username || clerkUser.primaryEmailAddress?.emailAddress?.split('@')[0] || '',
+                fullName: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User',
+                profileImage: clerkUser.imageUrl,
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to set auth token:', error);
+      }
+    };
+
+    setupAuth();
+  }, [isSignedIn, clerkUser?.id]);
 
   // Initialize Ably real-time connection
   useEffect(() => {

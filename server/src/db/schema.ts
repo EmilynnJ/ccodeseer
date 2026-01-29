@@ -316,6 +316,14 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Newsletter subscribers
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  subscribedAt: timestamp('subscribed_at').defaultNow().notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ one, many }) => ({
   readerProfile: one(readerProfiles, {
