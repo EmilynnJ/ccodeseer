@@ -54,7 +54,7 @@ export default function IncomingReadingRequest({ request, onClose }: Props) {
     setIsAccepting(true);
     try {
       if (audioRef.current) audioRef.current.pause();
-      const result = await acceptSession(request.sessionId);
+      await acceptSession(request.sessionId);
       toast.success('Session accepted! Connecting...');
       navigate(`/session/${request.sessionId}`);
       onClose();

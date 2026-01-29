@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clock, MessageCircle, Phone, Video, Star, DollarSign } from 'lucide-react';
+import { Clock, MessageCircle, Phone, Video, DollarSign } from 'lucide-react';
 import api from '../../services/api';
 import { useAuthStore } from '../../stores/authStore';
 

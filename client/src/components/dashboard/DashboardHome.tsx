@@ -14,7 +14,7 @@ interface RecentSession {
 }
 
 export default function DashboardHome() {
-  const { user, clientProfile, readerProfile } = useAuthStore();
+  const { user, clientProfile } = useAuthStore();
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
