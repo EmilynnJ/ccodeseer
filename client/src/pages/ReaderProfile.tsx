@@ -9,7 +9,6 @@ import {
   Heart,
   Share2,
   Clock,
-  Award,
   ChevronLeft,
 } from 'lucide-react';
 import toast from 'react-hot-toast';

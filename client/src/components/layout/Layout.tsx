@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
 import Navbar from './Navbar';
@@ -18,7 +18,7 @@ interface ReadingRequest {
 }
 
 export default function Layout() {
-  const { isSignedIn, getToken } = useAuth();
+  const { isSignedIn } = useAuth();
   const { user, fetchUser } = useAuthStore();
   const { initAbly, disconnect, subscribeToNotifications } = useRealtimeStore();
   const [incomingRequest, setIncomingRequest] = useState<ReadingRequest | null>(null);

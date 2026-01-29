@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import {
   BarChart,
   Users,
   DollarSign,
   Video,
   ShoppingBag,
-  Settings,
   Plus,
   Eye,
 } from 'lucide-react';
@@ -245,8 +244,6 @@ function UserManagement() {
 }
 
 export default function AdminDashboard() {
-  const location = useLocation();
-
   return (
     <div className="space-y-8">
       <div>

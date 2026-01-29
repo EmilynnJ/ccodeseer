@@ -9,7 +9,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isSignedIn } = useAuth();
-  const { user, clientProfile } = useAuthStore();
+  const { clientProfile } = useAuthStore();
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
