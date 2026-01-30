@@ -38,7 +38,14 @@ export function createApp(): Express {
 
   // CORS configuration
   app.use(cors({
-    origin: config.frontendUrl,
+    origin: (origin, callback) => {
+      // Allow same-origin (no origin header), configured frontend, and Vercel preview URLs
+      if (!origin || origin === config.frontendUrl || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
