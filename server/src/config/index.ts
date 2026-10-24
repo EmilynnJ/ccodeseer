@@ -37,6 +37,13 @@ export const config = {
 
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 
+  // Extra origins allowed in addition to frontendUrl (comma-separated),
+  // for example specific Vercel preview deployment URLs.
+  allowedOrigins: (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+
   jwt: {
     secret: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
   },

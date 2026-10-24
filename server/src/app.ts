@@ -6,6 +6,7 @@ import compression from 'compression';
 import { clerkMiddleware } from '@clerk/express';
 
 import { config } from './config/index.js';
+import { isAllowedOrigin } from './config/cors.js';
 import { loadUser } from './middleware/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
@@ -39,12 +40,8 @@ export function createApp(): Express {
   // CORS configuration
   app.use(cors({
     origin: (origin, callback) => {
-      // Allow same-origin (no origin header), configured frontend, and Vercel preview URLs
-      if (!origin || origin === config.frontendUrl || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
+      // Allow same-origin requests (no Origin header) and the explicitly configured origins only
+      callback(null, isAllowedOrigin(origin));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
